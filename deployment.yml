@@ -1,0 +1,30 @@
+apiVersion: apps/v1                # API version for Deployments
+kind: Deployment                   # Specifies this is a Deployment object
+
+metadata:
+  name: nginx-deployment           # Name of the Deployment
+  labels:
+    app: nginx                     # Labels to identify and group resources
+
+spec:
+  replicas: 3                      # Desired number of pod replicas (i.e., run 3 nginx pods)
+
+  selector:                        # Defines how the Deployment finds which Pods to manage
+    matchLabels:
+      app: nginx                   # It selects Pods with this label
+
+  strategy:
+    type: RollingUpdate            # Update strategy: update Pods one-by-one to avoid downtime
+
+  template:                        # Pod template that will be replicated
+    metadata:
+      labels:
+        app: nginx                 # Labels applied to Pods created by this Deployment
+
+    spec:                          # Pod specification (like a regular Pod definition)
+      containers:
+        - name: nginx              # Container name inside the Pod
+          image: nginx:latest      # Docker image to run (from Docker Hub)
+          resources: {}            # Placeholder for resource requests/limits (optional)
+      
+      restartPolicy: Always        # Always restart the container if it fails (default for Deployments)

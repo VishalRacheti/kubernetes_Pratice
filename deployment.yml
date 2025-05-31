@@ -7,7 +7,7 @@ metadata:
     app: nginx                     # Labels to identify and group resources
 
 spec:
-  replicas: 3                      # Desired number of pod replicas (i.e., run 3 nginx pods)
+  replicas: 1                      # Desired number of pod replicas (i.e., run 3 nginx pods)
 
   selector:                        # Defines how the Deployment finds which Pods to manage
     matchLabels:

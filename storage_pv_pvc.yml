@@ -1,0 +1,55 @@
+# -----------------------------
+# Pod - Section
+# -----------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: busybox-container  # Name of the container in the pod
+      image: busybox:latest  # Using a BusyBox image for simplicity
+      command: ["sh", "-c", "while true; do echo 'Hello, Kubernetes!' && sleep 3600; done"]  # Keeps the container running
+      resources: {}
+      volumeMounts:
+        - name: my-volume  # Name of the volume to mount
+          mountPath: /usr/share/busyboxvishal/html  # Path inside the container where the volume will be mounted
+  volumes:
+    - name: my-volume  # Name of the volume to be used in the pod
+      persistentVolumeClaim:
+        claimName: my-pvc  # Name of the PersistentVolumeClaim to use
+       
+# This YAML file defines a Kubernetes Pod that uses a PersistentVolumeClaim (PVC) to mount a volume.
+---
+# -----------------------------
+# PersistentVolume (PV) Section
+# -----------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv  # Name of the PersistentVolume
+spec:
+  capacity:
+    storage: 5Gi  # Total size of the volume
+  accessModes:
+    - ReadWriteOnce  # Can be mounted as read-write by a single node
+  #persistentVolumeReclaimPolicy: Retain  # Keep the data even if the PVC is deleted
+  storageClassName: manual  # Custom storage class name
+  hostPath:
+    path: /mnt/data  # Directory path on the host machine (for local testing)
+
+---
+# -----------------------------
+# PersistentVolumeClaim (PVC) Section
+# -----------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc  # Name of the claim
+spec:
+  accessModes:
+    - ReadWriteOnce  # Must match PV's access mode
+  resources:
+    requests:
+      storage: 5Gi  # How much storage the pod is requesting
+  storageClassName: manual  # Must match the PV's storage class

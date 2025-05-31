@@ -1,0 +1,61 @@
+# -----------------------------
+# Pod - Python Pod with PVC
+# -----------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: python-pod
+spec:
+  replicas: 2 
+  restartPolicy: Always
+  containers:
+    - name: python-container
+      image: python:3.9  # Use official Python image
+      command: ["python", "-c"]
+      args:
+        - |
+          with open('/mnt/data/output.txt', 'w') as f:
+              f.write('Hello from Kubernetes Python pod!')
+          import time
+          time.sleep(3600)
+      volumeMounts:
+        - name: my-volume
+          mountPath: /mnt/data
+  volumes:
+    - name: my-volume
+      persistentVolumeClaim:
+        claimName: my-pvc
+
+---
+# -----------------------------
+# PersistentVolume (PV) Section
+# -----------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data
+
+---
+# -----------------------------
+# PersistentVolumeClaim (PVC) Section
+# -----------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: manual
